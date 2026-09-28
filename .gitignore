@@ -1,0 +1,20 @@
+# Python environments and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Local credentials
+.env
+.env.*
+
+# Viewer settings
+imgui.ini
+.polyscope.ini
+
+# Downloaded mesh collection
+implementation/dataset/
