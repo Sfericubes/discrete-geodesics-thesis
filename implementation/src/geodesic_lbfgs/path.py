@@ -9,7 +9,7 @@ class SurfacePoint:
         """Construct a surface point from barycentric coordinates."""
 
         self.face = int(face)
-        self.barycentric = np.asarray(barycentric, dtype=float,)
+        self.barycentric = np.asarray(barycentric, dtype=float).copy()
 
         if self.barycentric.shape != (3,):
             raise ValueError(
@@ -32,9 +32,10 @@ class SurfacePoint:
             )
 
     def position(self, mesh):
-        """Return the three-dimensional position on the mesh."""
+        """Return the three-dimensional position of the point on the mesh."""
 
-        triangle_vertices = mesh.V[mesh.F[self.face]]
+        triangle = mesh.F[self.face]
+        triangle_vertices = mesh.V[triangle]
 
         return self.barycentric @ triangle_vertices
 
@@ -51,21 +52,16 @@ class Path:
         if face_sequence_array.ndim != 1:
             raise ValueError("The face sequence must be one-dimensional.")
 
+        if len(face_sequence_array) == 0:
+            raise ValueError(
+                "The face sequence cannot be empty."
+            )
+
         if not np.issubdtype(face_sequence_array.dtype, np.integer):
             raise TypeError("The face sequence must contain integer indices.")
 
         self.face_sequence = face_sequence_array.astype(int, copy=True)
-        self.lambdas = np.asarray(lambdas, dtype=float)
-
-        if self.source.face != self.face_sequence[0]:
-            raise ValueError(
-                "The source must belong to the first face."
-            )
-
-        if self.target.face != self.face_sequence[-1]:
-            raise ValueError(
-                "The target must belong to the last face."
-            )
+        self.lambdas = np.asarray(lambdas, dtype=float).copy()
 
         if self.lambdas.ndim != 1:
             raise ValueError("Lambdas must be one-dimensional.")
@@ -82,23 +78,21 @@ class Path:
         if np.any(self.face_sequence >= len(self.mesh.F)):
             raise ValueError("A face index is out of range.")
 
+        if self.source.face != self.face_sequence[0]:
+            raise ValueError(
+                "The source must belong to the first face."
+            )
+
+        if self.target.face != self.face_sequence[-1]:
+            raise ValueError(
+                "The target must belong to the last face."
+            )
+
         if not np.all(np.isfinite(self.lambdas)):
             raise ValueError("Lambdas must be finite.")
 
         if np.any(self.lambdas < 0.0) or np.any(self.lambdas > 1.0):
             raise ValueError("Each lambda must belong to [0, 1].")
-        
-        if self.source.shape != (3,):
-            raise ValueError("Source must be a three-dimensional point.")
-
-        if self.target.shape != (3,):
-            raise ValueError("Target must be a three-dimensional point.")
-
-        if not np.all(np.isfinite(self.source)):
-            raise ValueError("Source coordinates must be finite.")
-
-        if not np.all(np.isfinite(self.target)):
-            raise ValueError("Target coordinates must be finite.")
 
     def crossed_edges(self):
         """Return the ordered indices of the crossed mesh edges."""

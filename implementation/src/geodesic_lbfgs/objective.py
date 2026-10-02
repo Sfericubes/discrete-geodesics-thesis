@@ -1,17 +1,16 @@
 """Length objective and gradient for a mesh path."""
 
 import numpy as np
-from geodesic_lbfgs.path import Path
 
 # [p1-s, p2-p1, ..., t-pk]
-def path_segment_vectors(path: Path) -> np.ndarray:
+def path_segment_vectors(path) -> np.ndarray:
     """Return the ordered vectors of the path segments."""
     
     points = path.points()
     segment_vectors = points[1:] - points[:-1]
     return segment_vectors
 
-def crossing_edge_vectors(path: Path) -> np.ndarray:
+def crossing_edge_vectors(path) -> np.ndarray:
     """Return the ordered direction vectors of the crossed edges."""
     
     edges = path.crossed_edges()
@@ -39,7 +38,7 @@ def length(path):
 # gradient of L
 # how the length change wrt to moving the crossing points
 # along the crossed edges
-def gradient(path: Path) -> np.ndarray:
+def gradient(path) -> np.ndarray:
     """Return the derivative of path length with respect to lambdas."""
 
     partial_derivatives = []
