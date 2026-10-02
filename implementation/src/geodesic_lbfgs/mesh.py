@@ -54,16 +54,11 @@ class Mesh:
         if second_face < 0 or second_face >= number_of_faces:
             raise IndexError("The second face index is out of range.")
     
-        local_edges = np.flatnonzero(
-            self.TT[first_face] == second_face
-        )
-    
-        if len(local_edges) == 0:
-            raise ValueError("The faces do not share an edge.")
-    
-        local_edge = local_edges[0]
-    
-        return int(self.FE[first_face, local_edge])
+        for local_edge in range(3):
+            if self.TT[first_face, local_edge] == second_face:
+                return int(self.FE[first_face, local_edge])
+
+        raise ValueError("The faces do not share an edge.")
 
 
 def load_mesh(filename):
